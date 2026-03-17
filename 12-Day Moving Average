@@ -1,0 +1,114 @@
+// =============================================================================
+    DATE TABLE
+// =============================================================================
+
+DateTable =
+VAR MinDate = DATE(2015, 1, 1)
+VAR MaxDate = DATE(2030, 12, 31)
+RETURN
+ADDCOLUMNS(
+    CALENDAR(MinDate, MaxDate),
+    "Year", YEAR([Date]),
+    "Month Number", MONTH([Date]),
+    "Month Name", FORMAT([Date], "MMMM"),
+    "Month Short", FORMAT([Date], "MMM"),
+    "Quarter", "Q" & FORMAT([Date], "Q"),
+    "Year-Month", FORMAT([Date], "YYYY-MM"),
+    "Week Number", WEEKNUM([Date], 2),
+    "Day", DAY([Date]),
+    "Day Name", FORMAT([Date], "DDDD"),
+    "Day Short", FORMAT([Date], "DDD"),
+    "Is Weekend", IF(WEEKDAY([Date], 2) > 5, TRUE(), FALSE())
+)
+
+// =============================================================================
+// 12-DAY MOVING AVERAGE MEASURES
+// Use with a dynamic date table. Replace Sales[Value] and table/column names
+// to match your model.
+// =============================================================================
+
+// --- 12-day moving average (trailing, current date + previous 11 days) ---
+12 Day Moving Average =
+VAR CurrentDate =
+    MAX ( DateTable[Date] )
+VAR DateRange =
+    DATESINPERIOD ( DateTable[Date], CurrentDate, -11, DAY )
+RETURN
+    CALCULATE (
+        AVERAGE ( Sales[Value] ),
+        DateRange,
+        ALLSELECTED ( DateTable )
+    )
+
+// --- 12-day moving average excluding today (past 12 days only) ---
+12 Day Moving Average Excl Today =
+VAR CurrentDate =
+    MAX ( DateTable[Date] )
+VAR DateRange =
+    DATESINPERIOD ( DateTable[Date], CurrentDate, -12, DAY )
+RETURN
+    CALCULATE (
+        AVERAGE ( Sales[Value] ),
+        DateRange,
+        ALLSELECTED ( DateTable )
+    )
+
+// --- Sum-based 12-day moving average (sum over 12 days / 12) ---
+12 Day Moving Average Sum =
+VAR CurrentDate =
+    MAX ( DateTable[Date] )
+VAR DateRange =
+    DATESINPERIOD ( DateTable[Date], CurrentDate, -11, DAY )
+RETURN
+    DIVIDE (
+        CALCULATE (
+            SUM ( Sales[Value] ),
+            DateRange,
+            ALLSELECTED ( DateTable )
+        ),
+        12,
+        BLANK ()
+    )
+
+// --- 12-day MA over last 12 visible dates (one value for filtered period) ---
+12 Day MA Last 12 Visible =
+VAR LastVisible =
+    MAX ( DateTable[Date] )
+VAR Window =
+    DATESINPERIOD ( DateTable[Date], LastVisible, -11, DAY )
+RETURN
+    CALCULATE (
+        AVERAGE ( Sales[Value] ),
+        Window,
+        ALLSELECTED ( DateTable )
+    )
+
+// --- 12-day MA by date, ignores date filters (row-level rolling window) ---
+12 Day MA By Date =
+VAR CurrentDate =
+    MAX ( DateTable[Date] )
+VAR RollingWindow =
+    DATESINPERIOD ( DateTable[Date], CurrentDate, -11, DAY )
+RETURN
+    CALCULATE (
+        AVERAGE ( Sales[Value] ),
+        RollingWindow,
+        REMOVEFILTERS ( DateTable )
+    )
+
+// --- 12-day moving average of an existing measure (e.g. [Total Sales]) ---
+12 Day MA of Total Sales =
+VAR CurrentDate =
+    MAX ( DateTable[Date] )
+VAR DateRange =
+    DATESINPERIOD ( DateTable[Date], CurrentDate, -11, DAY )
+RETURN
+    DIVIDE (
+        CALCULATE (
+            [Total Sales],
+            DateRange,
+            ALLSELECTED ( DateTable )
+        ),
+        12,
+        BLANK ()
+    )
