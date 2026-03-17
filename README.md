@@ -122,6 +122,12 @@ This project is licensed under the MIT License – see the LICENSE file for deta
 
 Inspired by real-world business intelligence requirements
 
+## Tools & Technologies
+
+![Excel](https://img.shields.io/badge/Excel-217346?style=for-the-badge&logo=microsoft-excel&logoColor=white)
+![SQL](https://img.shields.io/badge/SQL-00758F?style=for-the-badge&logo=postgresql&logoColor=white)
+![Power BI](https://img.shields.io/badge/Power%20BI-F2C80F?style=for-the-badge&logo=power-bi&logoColor=black)
+![DAX](https://img.shields.io/badge/DAX-Analytics-blue?style=for-the-badge)
 Built upon Microsoft DAX language specifications
 
 Community feedback and contributions
