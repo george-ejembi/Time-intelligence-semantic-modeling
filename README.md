@@ -53,7 +53,7 @@ The foundation for all time intelligence calculations. This table generates a co
 - **Day Properties:** Day name, short name, weekend flag  
 - **Sorting Ready:** Properly formatted for chronological sorting  
 
-```dax
+dax
 DateTable = 
 VAR MinDate = DATE(2015, 1, 1)
 VAR MaxDate = DATE(2030, 12, 31)
