@@ -1,59 +1,94 @@
-# 📊 DAX Measures Repository
+# Time Intelligence Semantic Modeling Framework (DAX)
 
-A comprehensive collection of **DAX (Data Analysis Expressions) measures** for business intelligence and analytics in **Power BI**, **Analysis Services**, and **Excel Power Pivot**. This repository provides **reusable, well-documented DAX formulas** for common analytical scenarios.
+A modular and scalable **DAX-based semantic modeling framework** for implementing advanced **time intelligence analytics** in **Power BI**, **Analysis Services**, and **Excel Power Pivot**.
 
----
-
-## 📋 Table of Contents
-- [Prerequisites](#-prerequisites)  
-- [Repository Structure](#-repository-structure)  
-- [Date Table](#-date-table)  
-- [Moving Average Measures](#-moving-average-measures)  
-- [Installation](#-installation)  
-- [Usage Guidelines](#-usage-guidelines)  
-- [Customization](#-customization)  
-- [Contributing](#-contributing)  
-- [Best Practices](#-best-practices)  
-- [License](#-license)  
-- [Additional Resources](#-additional-resources)  
-- [Acknowledgments](#-acknowledgments)  
+This repository goes beyond static measures by introducing a **parameter-driven, switchable metric architecture** for rolling, cumulative, and statistical analysis.
 
 ---
 
-## 🔧 Prerequisites
+# Overview
 
-- **Tools:** Power BI Desktop, SQL Server Data Tools, or Excel Power Pivot  
-- **Data Model:** Properly structured star schema with a date table relationship  
-- **Tables:** At minimum, a `Sales` table with numeric values and a `DateTable`  
-- **Knowledge:** Basic understanding of DAX syntax and context transition  
+This project implements a **layered semantic model** that enables:
+
+* Dynamic rolling window analysis (7, 12, 30, 90 days)
+* Rolling Average & Rolling Median (outlier-resistant)
+* Year-to-Date (YTD) Average
+* Rolling YTD Hybrid Metrics
+* Switchable metric logic via slicers
+* Reusable and scalable DAX design patterns
 
 ---
 
-## 📁 Repository Structure
-dax-measures/
+# Architecture
+
+The model is structured into four logical layers:
+
+# 1. **Date Layer**
+
+* Centralized `DateTable`
+* Drives all time intelligence logic
+
+# 2. **Parameter Layer (Control Layer)**
+
+* Rolling Period Selector
+* Metric Selector
+
+# 3. **Computation Layer**
+
+* Moving averages
+* Rolling median
+* YTD calculations
+
+# 4. **Abstraction Layer**
+
+* Unified **SWITCH-based measure**
+* Enables dynamic metric selection
+
+---
+
+# 📁 Repository Structure
+
+```
+dax-time-intelligence-semantic-model/
 │
-├── README.md # Project documentation
-├── date-table.dax # Date table generation script
-├── moving-averages.dax # Moving average calculations
-├── time-intelligence.dax # YoY, MoM, QoQ comparisons
-├── financial-measures.dax # Financial KPIs (revenue, profit, margins)
-└── statistical-measures.dax # Statistical calculations
-
-
+├── models/
+│   ├── date_table/
+│   │   └── date_table.dax
+│   │
+│   ├── parameters/
+│   │   ├── rolling_period_table.dax
+│   │   └── metric_selector_table.dax
+│   │
+│   └── measures/
+│       ├── base_measures.dax
+│       ├── rolling_measures.dax
+│       └── switch_measures.dax
+│
+├── docs/
+│   ├── architecture.md
+│   ├── measure_definitions.md
+│   └── usage_guide.md
+│
+├── reports/
+│   └── dashboard.pbix
+│
+└── README.md
+```
 
 ---
 
-## 📅 Date Table
+# Date Table (Foundation Layer)
 
-The foundation for all time intelligence calculations. This table generates a comprehensive **date dimension from 2015 to 2030**.
+A fully featured date dimension supporting all time-based calculations.
 
-**Key Features:**
-- **Date Range:** 2015-2030 (customizable)  
-- **Attributes:** Year, Month (name/number/short), Quarter, Week Number  
-- **Day Properties:** Day name, short name, weekend flag  
-- **Sorting Ready:** Properly formatted for chronological sorting  
+# Key Features
 
-dax
+* Configurable date range (default: 2015–2030)
+* Calendar attributes: Year, Month, Quarter, Week
+* Day-level attributes: Day name, weekend flag
+* Optimized for sorting and filtering
+
+```dax
 DateTable = 
 VAR MinDate = DATE(2015, 1, 1)
 VAR MaxDate = DATE(2030, 12, 31)
@@ -72,65 +107,165 @@ ADDCOLUMNS(
     "Day Short", FORMAT([Date], "DDD"),
     "Is Weekend", IF(WEEKDAY([Date], 2) > 5, TRUE(), FALSE())
 )
+```
 
-📈 Moving Average Measures
+---
 
-Six variations of 12-day moving averages for different analytical needs:
+# 🎛️ Parameter Layer (Dynamic Control)
 
-| Measure Name                     | Description                             | Use Case                    |
-| -------------------------------- | --------------------------------------- | --------------------------- |
-| 12 Day Moving Average            | Trailing 12 days including current date | Standard rolling average    |
-| 12 Day Moving Average Excl Today | Past 12 days only, excludes today       | Lagging indicator           |
-| 12 Day Moving Average Sum        | Sum-based calculation (total/12)        | When you need sum context   |
-| 12 Day MA Last 12 Visible        | Based on last visible date in filter    | Period-end analysis         |
-| 12 Day MA By Date                | Ignores date filters for row-level      | Independent trend analysis  |
-| 12 Day MA of Total Sales         | Works with existing measure             | Reuse existing calculations |
+# Rolling Period Table
 
+Controls window size dynamically:
 
+* 7 days
+* 12 days
+* 30 days
+* 60 days
+* 90 days
 
-Key Differences:
+# Metric Selector
 
-ALLSELECTED vs REMOVEFILTERS: Controls whether user filters affect the calculation
+Enables switching between:
 
--11 vs -12 days: Determines whether to include or exclude current date
+* Moving Average
+* Rolling Median
+* YTD Average
+* Rolling YTD Average
 
-AVERAGE vs SUM/12: Different calculation methods for the same result
+---
 
+# Core Measures
 
-🎯 Usage Guidelines
+# Dynamic Moving Average
 
-Measure Selection Guide:
+* Parameter-driven rolling window
+* Responds to slicer selection
 
-graph TD
-    A[Need Moving Average?] --> B{Include Today?}
-    B -->|Yes| C[Use 12 Day Moving Average]
-    B -->|No| D[Use 12 Day Moving Average Excl Today]
-    C --> E{Need Exact Division?}
-    E -->|Yes| F[Use 12 Day Moving Average Sum]
-    E -->|No| G{Based on Measure?}
-    G -->|Yes| H[Use 12 Day MA of Total Sales]
-    G -->|No| I{Respect Filters?}
-    I -->|Yes| J[Use 12 Day MA Last 12 Visible]
-    I -->|No| K[Use 12 Day MA By Date]
+# Rolling Median
 
-📝 License
+* Outlier-resistant alternative to averages
+* Uses `MEDIANX` over rolling window
 
-This project is licensed under the MIT License – see the LICENSE file for details.
+# YTD Average
 
+* Expanding window from start of year
+* Robust against sparse data
 
-🙏 Acknowledgments
+# Rolling YTD Average
 
-Inspired by real-world business intelligence requirements
+* Hybrid model: rolling window constrained within year
 
-## Tools & Technologies
+---
 
-![Excel](https://img.shields.io/badge/Excel-217346?style=for-the-badge&logo=microsoft-excel&logoColor=white)
-![SQL](https://img.shields.io/badge/SQL-00758F?style=for-the-badge&logo=postgresql&logoColor=white)
-![Power BI](https://img.shields.io/badge/Power%20BI-F2C80F?style=for-the-badge&logo=power-bi&logoColor=black)
+# Switchable Metric (Abstraction Layer)
+
+A single unified measure dynamically switches logic:
+
+```dax
+Switchable Rolling Metric =
+VAR SelectedMetric =
+    SELECTEDVALUE ( 'Rolling Metric Selector'[Metric], "Moving Average" )
+RETURN
+    SWITCH (
+        TRUE (),
+        SelectedMetric = "Moving Average", [Dynamic Moving Average],
+        SelectedMetric = "Rolling Median", [Dynamic Rolling Median],
+        SelectedMetric = "YTD Average", [YTD Average],
+        SelectedMetric = "Rolling YTD Average", [Rolling YTD Average]
+    )
+```
+
+---
+
+# 🎯 Usage Guide
+
+### Step 1: Model Setup
+
+* Create `DateTable`
+* Establish relationship:
+
+  ```
+  DateTable[Date] → Sales[Date]
+  ```
+
+### Step 2: Add Slicers
+
+* Rolling Period
+* Metric Selector
+
+### Step 3: Use Measure
+
+* Add **Switchable Rolling Metric** to visuals
+
+---
+
+## ⚙️ Analytical Capabilities
+
+This framework enables:
+
+* Trend smoothing (short vs long windows)
+* Outlier-resistant analytics (median)
+* Cumulative performance tracking (YTD)
+* Interactive KPI exploration
+* Flexible time-series analysis
+
+---
+
+## 🧩 Design Principles
+
+* **Modularity** → reusable measures
+* **Abstraction** → single-measure interface
+* **Scalability** → easy extension
+* **Interactivity** → slicer-driven analytics
+* **Semantic Clarity** → business-friendly logic
+
+---
+
+# Use Cases
+
+* Executive dashboards
+* Financial reporting
+* Sales trend analysis
+* KPI monitoring
+* Time-series exploration
+
+---
+
+# Tools & Technologies
+
+![Power BI](https://img.shields.io/badge/Power%20BI-F2C80F?style=for-the-badge\&logo=power-bi\&logoColor=black)
 ![DAX](https://img.shields.io/badge/DAX-Analytics-blue?style=for-the-badge)
-Built upon Microsoft DAX language specifications
+![Excel](https://img.shields.io/badge/Excel-217346?style=for-the-badge\&logo=microsoft-excel\&logoColor=white)
+![SQL](https://img.shields.io/badge/SQL-00758F?style=for-the-badge\&logo=postgresql\&logoColor=white)
 
-Community feedback and contributions
+---
 
-Maintainers: [George Ejembi]
-Last Updated: March 2026
+# Future Enhancements
+
+* Rolling standard deviation (volatility)
+* Z-score anomaly detection
+* Forecasting integration
+* Calculation Groups (Tabular Editor)
+* Multi-granularity (weekly/monthly)
+
+---
+
+# License
+
+MIT License
+
+---
+
+# Acknowledgments
+
+* Built on Microsoft DAX engine and tabular modeling principles
+* Inspired by real-world business intelligence use cases
+
+---
+
+# Maintainer
+
+**George Ejembi - Analytics Engineer**
+📅 Last Updated: March 2026
+
+---
