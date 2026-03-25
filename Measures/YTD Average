@@ -1,0 +1,8 @@
+YTD Average =
+VAR YTD_Dates =
+    DATESYTD ( DateTable[Date] )
+RETURN
+    DIVIDE (
+        CALCULATE ( SUM ( Sales[Value] ), YTD_Dates ),
+        CALCULATE ( DISTINCTCOUNT ( DateTable[Date] ), YTD_Dates )
+    )
