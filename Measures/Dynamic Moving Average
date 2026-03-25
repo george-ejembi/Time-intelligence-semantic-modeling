@@ -1,0 +1,11 @@
+Dynamic Moving Average =
+VAR SelectedDays =
+    SELECTEDVALUE ( 'Rolling Period'[Days], 12 )
+VAR CurrentDate =
+    MAX ( DateTable[Date] )
+RETURN
+    CALCULATE (
+        AVERAGE ( Sales[Value] ),
+        DATESINPERIOD ( DateTable[Date], CurrentDate, -SelectedDays + 1, DAY ),
+        ALLSELECTED ( DateTable )
+    )
