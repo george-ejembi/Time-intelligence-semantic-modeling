@@ -1,0 +1,13 @@
+Rolling Metric Selector =
+DATATABLE(
+    "Metric", STRING,
+    {
+        {"Moving Average"},
+        {"Rolling Median"},
+        {"YTD Average"},
+        {"Rolling YTD Average"}
+    }
+)
+
+
+** Chooses which logic branch to execute - Qualitative Control of the date table **
