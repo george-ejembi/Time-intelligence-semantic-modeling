@@ -1,0 +1,16 @@
+Dynamic Rolling Median =
+VAR SelectedDays =
+    SELECTEDVALUE ( 'Rolling Period'[Days], 12 )
+VAR CurrentDate =
+    MAX ( DateTable[Date] )
+VAR DateRange =
+    DATESINPERIOD ( DateTable[Date], CurrentDate, -SelectedDays + 1, DAY )
+RETURN
+    MEDIANX (
+        CALCULATETABLE (
+            VALUES ( DateTable[Date] ),
+            DateRange,
+            ALLSELECTED ( DateTable )
+        ),
+        CALCULATE ( SUM ( Sales[Value] ) )
+    )
