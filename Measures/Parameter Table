@@ -1,0 +1,11 @@
+Rolling Period =
+DATATABLE(
+    "Days", INTEGER,
+    {
+        {7},
+        {12},
+        {30},
+        {60},
+        {90}
+    }
+)
