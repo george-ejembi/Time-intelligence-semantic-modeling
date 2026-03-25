@@ -1,0 +1,21 @@
+Switchable Rolling Metric =
+VAR SelectedMetric =
+    SELECTEDVALUE ( 'Rolling Metric Selector'[Metric], "Moving Average" )
+RETURN
+    SWITCH (
+        TRUE (),
+
+        SelectedMetric = "Moving Average",
+            [Dynamic Moving Average],
+
+        SelectedMetric = "Rolling Median",
+            [Dynamic Rolling Median],
+
+        SelectedMetric = "YTD Average",
+            [YTD Average],
+
+        SelectedMetric = "Rolling YTD Average",
+            [Rolling YTD Average],
+
+        BLANK ()
+    )
