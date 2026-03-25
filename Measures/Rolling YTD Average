@@ -1,0 +1,15 @@
+Rolling YTD Average =
+VAR SelectedDays =
+    SELECTEDVALUE ( 'Rolling Period'[Days], 12 )
+VAR CurrentDate =
+    MAX ( DateTable[Date] )
+VAR StartOfYear =
+    DATE ( YEAR ( CurrentDate ), 1, 1 )
+VAR RollingStart =
+    MAX ( StartOfYear, CurrentDate - SelectedDays + 1 )
+RETURN
+    CALCULATE (
+        AVERAGE ( Sales[Value] ),
+        DATESBETWEEN ( DateTable[Date], RollingStart, CurrentDate ),
+        ALLSELECTED ( DateTable )
+    )
