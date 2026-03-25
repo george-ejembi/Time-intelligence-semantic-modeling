@@ -1,0 +1,10 @@
+Selected Metric Label =
+VAR Metric =
+    SELECTEDVALUE ( 'Rolling Metric Selector'[Metric], "Moving Average" )
+VAR Days =
+    SELECTEDVALUE ( 'Rolling Period'[Days], 12 )
+RETURN
+    Metric & " (" & Days & " Days)"
+
+
+** creates a dynamic title measure **
